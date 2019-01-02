@@ -1,0 +1,20 @@
+version: '3'
+services:
+  nginx:
+    build: nginx/
+    ports:
+     - "80:80"
+     - "443:443"
+    volumes:
+     -"/var/www/_letsencrypt":"/var/www/_letsencrypt"
+     -"/etc/nginx/sites-available":"/etc/nginx/sites-available"
+     -"/etc/nginx/sites-enabled":"/etc/nginx/sites-enabled"
+node:
+    build: node/
+    volumes:
+     -"/var/www/_letsencrypt":"/var/www/_letsencrypt"
+     -"/etc/nginx/sites-available":"/etc/nginx/sites-available"
+     -"/etc/nginx/sites-enabled":"/etc/nginx/sites-enabled"
+     -"/var/run/docker.sock":"/var/run/docker.sock"
+
+    

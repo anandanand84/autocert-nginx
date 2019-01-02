@@ -1,0 +1,6 @@
+PUT http://localhost:3300/domain/create
+Content-Type: application/json
+
+{
+    "hello" : "world"
+}
