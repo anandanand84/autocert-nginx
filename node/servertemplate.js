@@ -12,10 +12,10 @@ server {
 
 	location ${locationPath} {
 		proxy_pass ${proxyPath};
-		include nginxconfig.io/proxy.conf;
+		include proxy.conf;
 	}
 
-	include nginxconfig.io/general.conf;
+	include general.conf;
 }
 
 # HTTP redirect
@@ -25,7 +25,7 @@ server {
 
 	server_name .${domain};
 
-	include nginxconfig.io/letsencrypt.conf;
+	include letsencrypt.conf;
 
 	location / {
 		return 301 https://${domain}$request_uri;

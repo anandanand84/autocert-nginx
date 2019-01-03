@@ -22,8 +22,8 @@ app.delete('/domain/delete', function(req,res) {
     var { domain } = req.body;
     var exists = fs.existsSync(`${dataRoot}sites-enabled/${domain}.conf`)
     if(exists) {
-        fs.existsSync(`${dataRoot}sites-enabled/${domain}.conf`)
-        fs.existsSync(`${dataRoot}sites-available/${domain}.conf`)
+        fs.truncateSync(`${dataRoot}sites-enabled/${domain}.conf`)
+        fs.truncateSync(`${dataRoot}sites-available/${domain}.conf`)
     }
     res.json(exists);
 });
@@ -44,7 +44,7 @@ function createDomain({ domain, email, locationPath, proxyPath}) {
     var disableCertsCommand = ['Preparing for certificate generation', `sed`, `-i`, `-r`, `s/(listen .*443)/\\1;#/g; s/(ssl_(certificate|certificate_key|trusted_certificate) )/#;#\\1/g` ,serverConfigLocation]
     var generateCertsCommand = ['Generating certificate generation', `certbot`, `certonly`, `--webroot`, `-d`, domain, `--email`, email, `-w` ,`/var/www/_letsencrypt`, `-n`, `--agree-tos`, `--force-renewal`]
     var enableCertsCommand = ['Applying certs..', `sed`, `-i` , `-r`, `s/#?;#//g`, serverConfigLocation]
-    var commands = [linkFileCommand, nginxReload, disableCertsCommand, generateCertsCommand, enableCertsCommand, nginxReload];
+    var commands = [linkFileCommand,  disableCertsCommand, nginxReload, generateCertsCommand, enableCertsCommand, nginxReload];
     commands.forEach((command)=> {
         console.log(command[0]);
         var response = cp.spawnSync(command[1], command.slice(2))
@@ -52,8 +52,10 @@ function createDomain({ domain, email, locationPath, proxyPath}) {
         if(response.output) [result , stdout, stderr]  = response.output
         if(response.status === 0) {
             console.log(stdout);
+	    console.log('Success');
         } else {
-            console.log(response)
+            console.log(response.stdout ? response.stdout.toString() : "")
+            console.log(response.stderr ? response.stderr.toString() : "")
         }
     })
 }

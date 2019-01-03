@@ -16,7 +16,7 @@ services:
             - '3300:3300'
         volumes:
             - '/var/www/_letsencrypt:/var/www/_letsencrypt'
+            - '/var/run/docker.sock:/var/run/docker.sock'
             - '/etc/nginx/sites-available:/etc/nginx/sites-available'
             - '/etc/nginx/sites-enabled:/etc/nginx/sites-enabled'
-            - '/var/run/docker.sock:/var/run/docker.sock'
             - '/etc/letsencrypt:/etc/letsencrypt'
