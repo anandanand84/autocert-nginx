@@ -4,7 +4,7 @@ var express = require('express');
 var fs = require('fs');
 var bodyParser = require('body-parser')
 var app = express();
-var dataRoot = `/data/`
+var dataRoot = `/etc/nginx/`
 var nginxServerName = `autocert-nginx_nginx_1`;
 app.use(express.static('public'))
 app.use(bodyParser.urlencoded({ extended: false }))

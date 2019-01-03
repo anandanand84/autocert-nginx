@@ -6,18 +6,22 @@ services:
      - "80:80"
      - "443:443"
     volumes:
-     - "/data/_letsencrypt:/var/www/_letsencrypt"
-     - "/data/sites-available:/etc/nginx/sites-available"
-     - "/data/sites-enabled:/etc/nginx/sites-enabled"
-    #  - "/var/www/_letsencrypt:/var/www/_letsencrypt"
-    #  - "/etc/nginx/sites-available:/etc/nginx/sites-available"
-    #  - "/etc/nginx/sites-enabled:/etc/nginx/sites-enabled"
-# node:
-#     build: node/
-#     volumes:
-#      -"/var/www/_letsencrypt":"/var/www/_letsencrypt"
-#      -"/etc/nginx/sites-available":"/etc/nginx/sites-available"
-#      -"/etc/nginx/sites-enabled":"/etc/nginx/sites-enabled"
-#      -"/var/run/docker.sock":"/var/run/docker.sock"
+    #  - "/data/_letsencrypt:/var/www/_letsencrypt"
+    #  - "/data/sites-available:/etc/nginx/sites-available"
+    #  - "/data/sites-enabled:/etc/nginx/sites-enabled"
+      - "/var/www/_letsencrypt:/var/www/_letsencrypt"
+      - "/etc/nginx/sites-available:/etc/nginx/sites-available"
+      - "/etc/nginx/sites-enabled:/etc/nginx/sites-enabled"
+      - "/etc/letsencrypt":"/etc/letsencrypt"
+  node:
+     build: node/
+     ports:
+      - "3300:3300"
+     volumes:
+      - "/var/www/_letsencrypt":"/var/www/_letsencrypt"
+      - "/etc/nginx/sites-available":"/etc/nginx/sites-available"
+      - "/etc/nginx/sites-enabled":"/etc/nginx/sites-enabled"
+      - "/var/run/docker.sock":"/var/run/docker.sock"
+      - "/etc/letsencrypt":"/etc/letsencrypt"
 
     
