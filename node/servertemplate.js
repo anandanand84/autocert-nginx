@@ -5,15 +5,12 @@ server {
 	listen [::]:443 ssl http2;
 
 	server_name ${domain};
-	root /var/www/${domain}/public;
-
-	# SSL
+	
 	ssl_certificate /etc/letsencrypt/live/${domain}/fullchain.pem;
 	ssl_certificate_key /etc/letsencrypt/live/${domain}/privkey.pem;
 	ssl_trusted_certificate /etc/letsencrypt/live/${domain}/fullchain.pem;
 
-	# reverse proxy
-	location ${path} {
+	location ${locationPath} {
 		proxy_pass ${proxyPath};
 		include nginxconfig.io/proxy.conf;
 	}
