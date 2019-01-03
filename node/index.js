@@ -13,7 +13,7 @@ app.use(bodyParser.json())
 app.put('/domain/create', function (req, res) {
   if (!req.body) return res.sendStatus(400);
   console.log(req.body);
-  createDomain();
+  createDomain(req.body);
   res.json(req.body);
 });
 
