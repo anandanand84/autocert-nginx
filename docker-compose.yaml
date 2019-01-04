@@ -3,13 +3,16 @@ services:
     nginx:
         build: nginx/
         ports:
-            - '80:80'
-            - '443:443'
+            - '172.17.1.17:80:80'
+            - '172.17.1.17:443:443'
         volumes:
             - '/var/www/_letsencrypt:/var/www/_letsencrypt'
             - '/etc/nginx/sites-available:/etc/nginx/sites-available'
             - '/etc/nginx/sites-enabled:/etc/nginx/sites-enabled'
             - '/etc/letsencrypt:/etc/letsencrypt'
+        networks:
+            dockervlan:
+               ipv4_address: 172.17.1.17
     node:
         build: node/
         ports:
@@ -20,3 +23,11 @@ services:
             - '/etc/nginx/sites-available:/etc/nginx/sites-available'
             - '/etc/nginx/sites-enabled:/etc/nginx/sites-enabled'
             - '/etc/letsencrypt:/etc/letsencrypt'
+networks:
+  dockervlan:
+    driver: macvlan
+    driver_opts:
+      parent: xenbr0
+    ipam:
+      config:
+        - subnet: 172.17.1.0/24

@@ -1,5 +1,6 @@
 var cp = require('child_process');
-var getTemplate = require('./servertemplate');
+var getTemplate = require('./servertemplate').getTemplate;
+var getTemplateNoNSSL = require('./servertemplate').getTemplateNoNSSL;
 var express = require('express');
 var fs = require('fs');
 var bodyParser = require('body-parser')
@@ -37,14 +38,15 @@ app.get('/domains', function(req, res) {
 function createDomain({ domain, email, locationPath, proxyPath}) {
     email = email || 'anand.anand84@gmail.com'
     var template = getTemplate({ domain,locationPath, proxyPath })
+    var templateNonSSL = getTemplateNoNSSL({ domain,locationPath, proxyPath })
     var serverConfigLocation = `${dataRoot}sites-available/${domain}.conf`
-    fs.writeFileSync(serverConfigLocation, template);  
+    fs.writeFileSync(serverConfigLocation, templateNonSSL);  
     var linkFileCommand = ['Generating virtual server config file', `ln`, `-s` ,serverConfigLocation, `${dataRoot}sites-enabled/${domain}.conf`]
     var nginxReload = ['Reloading nginx config', `docker`, `exec`, nginxServerName, `nginx`, `-s`, `reload`]
-    var disableCertsCommand = ['Preparing for certificate generation', `sed`, `-i`, `-r`, `s/(listen .*443)/\\1;#/g; s/(ssl_(certificate|certificate_key|trusted_certificate) )/#;#\\1/g` ,serverConfigLocation]
+    // var disableCertsCommand = ['Preparing for certificate generation', `sed`, `-i`, `-r`, `s/(listen .*443)/\\1;#/g; s/(ssl_(certificate|certificate_key|trusted_certificate) )/#;#\\1/g` ,serverConfigLocation]
     var generateCertsCommand = ['Generating certificate generation', `certbot`, `certonly`, `--webroot`, `-d`, domain, `--email`, email, `-w` ,`/var/www/_letsencrypt`, `-n`, `--agree-tos`, `--force-renewal`]
-    var enableCertsCommand = ['Applying certs..', `sed`, `-i` , `-r`, `s/#?;#//g`, serverConfigLocation]
-    var commands = [linkFileCommand,  disableCertsCommand, nginxReload, generateCertsCommand, enableCertsCommand, nginxReload];
+    // var enableCertsCommand = ['Applying certs..', `sed`, `-i` , `-r`, `s/#?;#//g`, serverConfigLocation]
+    var commands = [linkFileCommand,  nginxReload, generateCertsCommand];
     commands.forEach((command)=> {
         console.log(command[0]);
         var response = cp.spawnSync(command[1], command.slice(2))
@@ -52,7 +54,22 @@ function createDomain({ domain, email, locationPath, proxyPath}) {
         if(response.output) [result , stdout, stderr]  = response.output
         if(response.status === 0) {
             console.log(stdout);
-	    console.log('Success');
+            console.log('Success');
+        } else {
+            console.log(response.stdout ? response.stdout.toString() : "")
+            console.log(response.stderr ? response.stderr.toString() : "")
+        }
+    })
+    fs.writeFileSync(serverConfigLocation, template);  
+    var commands = [nginxReload];
+    commands.forEach((command)=> {
+        console.log(command[0]);
+        var response = cp.spawnSync(command[1], command.slice(2))
+        var result, stdout, stderr;
+        if(response.output) [result , stdout, stderr]  = response.output
+        if(response.status === 0) {
+            console.log(stdout);
+            console.log('Success');
         } else {
             console.log(response.stdout ? response.stdout.toString() : "")
             console.log(response.stderr ? response.stderr.toString() : "")

@@ -1,4 +1,4 @@
-module.exports = function getTemplate({domain, locationPath, proxyPath}) {
+function getTemplate({domain, locationPath, proxyPath}) {
 return `
 server {
 	listen 443 ssl http2;
@@ -32,4 +32,24 @@ server {
 	}
 }
 `
+}
+
+function getTemplateNoNSSL({domain, locationPath, proxyPath}) {
+return`
+server {
+	listen 80;
+	listen [::]:80;
+
+	server_name .${domain};
+
+	include letsencrypt.conf;
+
+	location / {
+		return 301 https://${domain}$request_uri;
+	}
+}`
+}
+
+module.exports =  {
+	getTemplate, getTemplateNoNSSL
 }
